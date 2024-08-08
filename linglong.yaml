@@ -1,0 +1,134 @@
+version: "1"
+
+package:
+  id: net.minetest.Minetest
+  name: Minetest
+  version: 5.8.0.0
+  kind: app
+  description: |
+    Minetest is a free open-source voxel game engine with easy modding and game creation.
+
+base: org.deepin.foundation/23.0.0
+runtime: org.deepin.Runtime/23.0.1
+
+command:
+  - /opt/apps/net.minetest.Minetest/files/bin/minetest
+
+
+build: |
+  # install packages
+  install_pkg=$(realpath "./install_pkg.sh")
+  include_pkg=''
+  exclude_pkg=''
+  bash $install_pkg -i -d $(realpath 'linglong/sources') -p $PREFIX -I \"$include_pkg\" -E \"$exclude_pkg\"
+  export LD_LIBRARY_PATH=$PREFIX/lib/$TRIPLET:$LD_LIBRARY_PATH
+  
+  # build ninja
+  cd /project/linglong/sources/ninja.git
+  cmake -Bbuild
+  cmake --build build -j$(nproc)
+  ninja="$(pwd)/build/ninja"
+  
+  # build SDL2
+  cd /project/linglong/sources/SDL.git
+  mkdir build
+  cd build
+  ../configure --prefix=$PREFIX \
+               --enable-static=no
+  make -j$(nproc)
+  make install
+  
+  # build irrlicht
+  cd /project/linglong/sources/irrlicht.git
+  cmake -Bbuild \
+        -DCMAKE_BUILD_TYPE=Release \
+        -G Ninja \
+        -DCMAKE_MAKE_PROGRAM=$ninja \
+        -DCMAKE_INSTALL_PREFIX=$PREFIX \
+        -DCMAKE_INSTALL_LIBDIR=$PREFIX/lib/$TRIPLET
+  cmake --build build -j4
+  cmake --install build
+  
+  # build minetest
+  cd /project/linglong/sources/minetest.git
+  cmake -Bbuild \
+        -DCMAKE_BUILD_TYPE=Release \
+        -G Ninja \
+        -DCMAKE_MAKE_PROGRAM=$ninja \
+        -DCMAKE_INSTALL_PREFIX=$PREFIX \
+        -DCMAKE_INSTALL_RPATH=${PREFIX}/lib/${TRIPLET}
+  cmake --build build -j4
+  cmake --install build
+  
+  # uninstall dev packages
+  bash $install_pkg -u -r '\-dev' -D
+
+
+sources:
+  # ninja
+  - kind: git
+    url: https://github.com/ninja-build/ninja.git
+    version: v1.12.1
+    commit: 2daa09ba270b0a43e1929d29b073348aa985dfaa
+  # SDL2
+  - kind: git
+    url: https://github.com/libsdl-org/SDL.git
+    version: release-2.30.6
+    commit: ba2f78a0069118a6c583f1fbf1420144ffa35bad
+  # irrlicht
+  - kind: git
+    url: https://github.com/minetest/irrlicht.git
+    version: 1.9.0mt13
+    commit: 99be15f40b799910cd30b37a88621037634c1c86
+  # minetest
+  - kind: git
+    url: https://github.com/minetest/minetest.git
+    version: 5.8.0
+    commit: 49ce5a2de633d751080a0c97b802ae48190bf911
+  # packages: libopenal-dev,libopenal1,libvorbis-dev,libogg-dev,libcurl4-openssl-dev,libcurl4,libleveldb-dev,libleveldb1d,libhiredis-dev,libgl1-mesa-dev,libjpeg-dev,libluajit-5.1-dev,libsnappy-dev,libsnappy1v5,libsndio7.0
+  - kind: file
+    url: https://mirrors.ustc.edu.cn/deepin/beige/pool/main/o/openal-soft/libopenal-dev_1.19.1-2_amd64.deb
+    digest: 901d42e8dbfaf00638d283b9d55f54e6fce34e1e6272e97cb5ff829e55a30a4b
+  - kind: file
+    url: https://mirrors.ustc.edu.cn/deepin/beige/pool/main/o/openal-soft/libopenal1_1.19.1-2_amd64.deb
+    digest: 6519188f969234cbdc9e3cb8346d86339b1f766db083e2519cfdc68b917e00ae
+  - kind: file
+    url: https://mirrors.ustc.edu.cn/deepin/beige/pool/main/libv/libvorbis/libvorbis-dev_1.3.7-1_amd64.deb
+    digest: bdcc73580c9bb62fd6994c12eaad66d6e4884120a740268059044924e4ecedf3
+  - kind: file
+    url: https://mirrors.ustc.edu.cn/deepin/beige/pool/main/libo/libogg/libogg-dev_1.3.5-3_amd64.deb
+    digest: 735b0184953b5309ac74fe506504c677612bcbd07b0fafece3c12041eef113b0
+  - kind: file
+    url: https://mirrors.ustc.edu.cn/deepin/beige/pool/main/c/curl/libcurl4-openssl-dev_8.5.0-2_amd64.deb
+    digest: 273ce1a75b0e8b1e31f0ce3d8441f9c42cfa9729c55ebef528bc2157dc3d7a02
+  - kind: file
+    url: https://mirrors.ustc.edu.cn/deepin/beige/pool/main/c/curl/libcurl4_8.5.0-2_amd64.deb
+    digest: 6e3d5ad17b738939a392e5f7eb00c1f129529834ca62b053e677ad03e6a1e12c
+  - kind: file
+    url: https://mirrors.ustc.edu.cn/deepin/beige/pool/main/l/leveldb/libleveldb-dev_1.23-3_amd64.deb
+    digest: e1f72144a7addcabac04c03cd3541144c0d64798afbe02e6853e610dbc8ed83c
+  - kind: file
+    url: https://mirrors.ustc.edu.cn/deepin/beige/pool/main/l/leveldb/libleveldb1d_1.23-3_amd64.deb
+    digest: 1989f3435bcaa213afa5c6b38a3fab71eaa13a7509febcd85671f2e53f53e0f2
+  - kind: file
+    url: https://mirrors.ustc.edu.cn/deepin/beige/pool/main/h/hiredis/libhiredis-dev_0.14.1-4_amd64.deb
+    digest: 9fe2bf701ebea208fed47edc00e22cf3f4882f43ad71fac1f6d2988e162b6ed3
+  - kind: file
+    url: https://mirrors.ustc.edu.cn/deepin/beige/pool/main/m/mesa/libgl1-mesa-dev_24.0.1-1deepin3_amd64.deb
+    digest: 148116e10144ea3fc0d969355ae317bc8a9484aca570a974e718dfb84ad96253
+  - kind: file
+    url: https://mirrors.ustc.edu.cn/deepin/beige/pool/main/libj/libjpeg-turbo/libjpeg-dev_2.1.5-2_amd64.deb
+    digest: fbc596effd2b0a596b71e306d120e5b660bd478c8c9d24e47c61b4ce2db33d27
+  - kind: file
+    url: https://mirrors.ustc.edu.cn/deepin/beige/pool/main/l/luajit/libluajit-5.1-dev_2.1.0+git20231223.c525bcb+dfsg-1deepin2_amd64.deb
+    digest: 38d282d199034f67f2378b95483113705e371b045ecdb5ef92782316f375ba58
+  - kind: file
+    url: https://mirrors.ustc.edu.cn/deepin/beige/pool/main/s/snappy/libsnappy-dev_1.1.10-1_amd64.deb
+    digest: 0b3ead75edfda0ef2fcb9f6f71c5569d34f98f7988357b477c3d4d47e4ead9c9
+  - kind: file
+    url: https://mirrors.ustc.edu.cn/deepin/beige/pool/main/s/snappy/libsnappy1v5_1.1.10-1_amd64.deb
+    digest: 5b062c9e447f90316be68c9e2750002dd33660b73cd501bf2c67280e4056b0f3
+  - kind: file
+    url: https://mirrors.ustc.edu.cn/deepin/beige/pool/main/s/sndio/libsndio7.0_1.5.0-3_amd64.deb
+    digest: aed22e5c4d4734dd70ea33993c33816409d15c1e6355d376abbd7ffccde29adc
+  

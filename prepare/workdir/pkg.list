@@ -1,1 +1,38 @@
-# nothing
+# OpenAL
+libopenal-dev
+libopenal1
+# Vorbis
+libvorbis-dev
+#libvorbis0a
+libogg-dev
+# cURL
+libcurl4-openssl-dev
+libcurl4
+# sql
+#libsqlite3-dev
+# PostgreSQL
+#postgresql-16
+#libpq-dev
+#libpq5
+# LevelDB
+libleveldb-dev
+libleveldb1d
+# Redis
+libhiredis-dev
+#####
+# ? #
+#gettext
+libgl1-mesa-dev
+#skipped libgmp-dev
+#skipped libpng-dev
+libjpeg-dev
+#skipped libzstd-dev
+#skipped libxi-dev 
+libluajit-5.1-dev
+libsnappy-dev
+libsnappy1v5
+# fix
+#libbrotli1
+#libbsd0
+# libopenal.so -> libsndio.so.7.0
+libsndio7.0

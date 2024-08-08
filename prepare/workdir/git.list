@@ -11,7 +11,17 @@ url=https://github.com/ninja-build/ninja.git
 version=v1.12.1
 commit=
 
-[]
-url=
-version=
+[SDL2]
+url=https://github.com/libsdl-org/SDL.git
+version=release-2.30.6
+commit=
+
+[irrlicht]
+url=https://github.com/minetest/irrlicht.git
+version=1.9.0mt13
+commit=
+
+[minetest]
+url=https://github.com/minetest/minetest.git
+version=5.8.0
 commit=

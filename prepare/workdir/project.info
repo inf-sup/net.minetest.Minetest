@@ -1,6 +1,6 @@
-PACKAGE_ID=
-PACKAGE_NAME=
-PACKAGE_VERSION=
-PACKAGE_DESCRIPTION=
+PACKAGE_ID=net.minetest.Minetest
+PACKAGE_NAME=Minetest
+PACKAGE_VERSION=5.8.0.0
+PACKAGE_DESCRIPTION=Minetest is a free open-source voxel game engine with easy modding and game creation.
 COMMAND=
-COMMAND_BIN=
+COMMAND_BIN=minetest
